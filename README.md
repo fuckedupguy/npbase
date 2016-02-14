@@ -1,2 +1,2 @@
-# npbase
-Just a my very own CMS
+# NP Base
+Just a brand new CMS from Fucked Up Guy
