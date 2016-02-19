@@ -1,10 +1,10 @@
     <div class="container">
       <div class="row">
         <div class="col-md-4 col-md-offset-4 margin-top-30px margin-bottom-30px">
-          <img src="../static/img/logo.jpg" class="img-responsive img-rounded center-block" alt="Logo">
+          <img src="../assets/img/logo.jpg" class="img-responsive img-rounded center-block" alt="Logo">
         </div>
         <div class="col-md-4 col-md-offset-4 text-center">
-          <a href="./setup.php?step=2" class="btn btn-primary">Start Setup</a>
+          <a href="setup.php?step=2" class="btn btn-primary">Start Setup</a>
         </div>
       </div>
     </div>
