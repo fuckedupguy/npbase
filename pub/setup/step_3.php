@@ -9,19 +9,19 @@ $error_msg = '';
 
 if (isset($_POST['submit'])) {
 	
-	$db_name = $_POST['db_name'];
-	$user_name = $_POST['user_name'];
-	$password = $_POST['password'];
-	$db_host = $_POST['db_host'];
-	$table_prefix = $_POST['table_prefix'];
+	$db_name = trim($_POST['db_name']);
+	$user_name = trim($_POST['user_name']);
+	$password = trim($_POST['password']);
+	$db_host = trim($_POST['db_host']);
+	$table_prefix = trim($_POST['table_prefix']);
 
-	if (empty($db_host) || empty($user_name) || empty($password) || empty($db_name) || empty($table_prefix)) {
+	if (empty($db_host) || empty($user_name) || empty($db_name) || empty($table_prefix)) {
 
 		$error_msg = '<div class="alert alert-danger alert-dismissible fade in" role="alert">
 					  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
   							<span aria-hidden="true">&times;</span>
 						</button>
-						All fields are required.
+						Please fill out all required fields.
 					  </div>';
 
 	} else {
@@ -32,17 +32,72 @@ if (isset($_POST['submit'])) {
 
 			$error_msg = '<div class="alert alert-danger alert-dismissible fade in" role="alert">
 					  		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-  								<span aria-hidden="true">&times;</span>
+  							 <span aria-hidden="true">&times;</span>
 							</button>
-							<h2 class="text-danger margin-top-0">Error establishing a database connection</h2>
-							<p>This either means that the username and password information in your <code>config.php</code> file is incorrect or we can’t contact the database server at <code>'.$db_host.'</code>. This could mean your host’s database server is down.</p>
+							 <h2 class="text-danger margin-top-0">Error establishing a database connection</h2>
+							 This either means that the username and password information in your <code>config.php</code> file is incorrect or we can’t contact the database server at <code>'.$db_host.'</code>. This could mean your host’s database server is down.
 							<ul>
-								<li>Are you sure you have the correct username and password?</li>
-								<li>Are you sure that you have typed the correct hostname?</li>
-								<li>Are you sure that the database server is running?</li>
+							 <li>Are you sure you have the correct username and password?</li>
+							 <li>Are you sure that you have typed the correct hostname?</li>
+							 <li>Are you sure that the database server is running?</li>
 							</ul>
 					  	  </div>';
 
+		} else {
+
+			if (file_exists('../../sys/config.php')) {
+
+				$error_msg = '<div class="alert alert-info alert-dismissible fade in" role="alert">
+					  			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  								 <span aria-hidden="true">&times;</span>
+								</button>
+								The file <code>config.php</code> already exists. If you need to reset any of the configuration items in this file, please delete it first.
+					  		  </div>';
+
+			} else {
+
+				$config_data = array(
+								 'db_name' => "/* The name of the database */\r\ndefine('DB_NAME', '".$db_name."');\r\n\r\n", 
+								 'db_user' => "/* MySQL database username */\r\ndefine('DB_USER', '".$user_name."');\r\n\r\n", 
+								 'db_password' => "/* MySQL database password */\r\ndefine('DB_PASSWORD', '".$password."');\r\n\r\n", 
+								 'db_host' => "/* MySQL hostname */\r\ndefine('DB_HOST', '".$db_host."');\r\n\r\n", 
+								 'db_table_prefix' => "/* Database table prefix */\r\ndefine('DB_TABLE_PREFIX', '".$table_prefix."');\r\n\r\n",
+								 'db_charset' => "/* Database Charset to use in creating database tables. */\r\ndefine('DB_CHARSET', 'utf8mb4');"
+								 );
+
+				$config_file = @fopen('../../sys/config.php', 'w');
+
+				if (!$config_file) {
+
+					$error_msg = '<div class="alert alert-info alert-dismissible fade in" role="alert">
+					  			  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  									 <span aria-hidden="true">&times;</span>
+								  	</button>
+								  	 For some reason this automatic <code>config.php</code> file creation doesn\'t work, don\'t worry. 
+								  	 All this does is fill in the database information to a configuration file. You may also simply...
+								  	<ol>
+								  	 <li>Open <code>config_dummy.php</code> file in <code>setup</code> directory using any text editor.</li>
+								  	 <li>Fill in your database informations and save the <code>config_dummy.php</code> file.</li>
+								  	 <li>Rename <code>config_dummy.php</code> into <code>config.php</code> file.</li>
+								  	</ol>
+					  		  	  </div>';
+
+				} else {
+
+					fwrite($config_file, "<?php\r\n\r\n/* Configuration file */\r\n\r\n");
+					foreach ($config_data as $line) {
+
+						fwrite($config_file, $line);
+
+					}
+
+					header('Location: setup.php?step=4');
+					exit;
+
+				}
+
+			}
+		
 		}
 
 	}	
@@ -83,7 +138,7 @@ if (isset($_POST['submit'])) {
 						</div>
 					</div>
 
-					<div class="form-group<?php echo empty($password) ? ' has-error' : '' ?>">
+					<div class="form-group">
 						<label for="password" class="col-sm-2 control-label">Password:</label>
 						<div class="col-sm-4">
 							<input type="text" class="form-control" id="password" placeholder="Password" name="password" value="<?php echo $password ?>">
@@ -113,8 +168,7 @@ if (isset($_POST['submit'])) {
 						</div>
 					</div>
 
-					<a href="setup.php?step=2" class="btn btn-default">Back</a>
-					<input class="btn btn-primary" type="submit" name="submit" value="Submit">
+					<a href="setup.php?step=2" class="btn btn-default btn-right-margin">Back</a><input class="btn btn-primary" type="submit" name="submit" value="Submit">
 				</form>
 			</div>
 		</div>
